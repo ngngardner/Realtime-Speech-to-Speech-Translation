@@ -10,6 +10,7 @@ dependencies = [
     "openai-whisper",
     "pyaudio>=0.2.14",
     "pycryptodome>=3.21.0",
+    "rich>=13.9.1",
     "sentencepiece>=0.2.0",
     "soundfile>=0.12.1",
     "speechrecognition>=3.10.4",

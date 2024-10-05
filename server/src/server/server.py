@@ -7,9 +7,12 @@ from typing import Dict
 
 import pyaudio
 import torch
+from rich.console import Console
 
 from server.models.speech_recognition import SpeechRecognitionModel
 from server.models.text_to_speech import TextToSpeechModel
+
+console = Console()
 
 
 class AudioSocketServer:
@@ -60,7 +63,7 @@ class AudioSocketServer:
 
     def handle_transcription(self, packet: str, client_socket):
         """Callback function to put finalized transcriptions into TTS"""
-        print(f"Added {packet} to synthesize task queue")
+        console.log(f"Added {packet} to synthesize task queue")
         self.text_to_speech.synthesise(packet, client_socket)
 
     def handle_synthesize(self, audio: torch.Tensor, client_socket):
@@ -70,7 +73,7 @@ class AudioSocketServer:
     def start(self):
         """Starts the server"""
         self.transcriber.start(16000, 2)
-        print(f"Listening on port {self.PORT}")
+        console.log(f"Listening on port {self.PORT}")
         self.serversocket.bind(("", self.PORT))
         self.serversocket.listen(self.BACKLOG)
         # Contains all of the socket connections, the first is the server socket for listening to
@@ -84,7 +87,7 @@ class AudioSocketServer:
                     if s is self.serversocket:
                         (clientsocket, address) = self.serversocket.accept()
                         self.read_list.append(clientsocket)
-                        print("Connection from", address)
+                        console.log("Connection from", address)
                     else:
                         try:
                             data = s.recv(4096)
@@ -93,28 +96,28 @@ class AudioSocketServer:
                                 self.data_queue.put((s, data))
                             else:
                                 self.read_list.remove(s)
-                                print("Disconnection from", address)
+                                console.log("Disconnection from", address)
                         except ConnectionResetError:
                             self.read_list.remove(s)
-                            print("Client crashed from", address)
+                            console.log("Client crashed from", address)
         except KeyboardInterrupt:
             pass
-        print("Performing server cleanup")
+        console.log("Performing server cleanup")
         self.audio.terminate()
         self.transcriber.stop()
         self.serversocket.shutdown(socket.SHUT_RDWR)
         self.serversocket.close()
-        print("Sockets cleaned up")
+        console.log("Sockets cleaned up")
 
     def stream_numpy_array_audio(self, audio, client_socket):
         """Streams audio back to the client"""
         if client_socket is None:
-            print("Error: client_socket is None")
+            console.log("Error: client_socket is None")
             return
         try:
             client_socket.sendall(audio.numpy().tobytes())
         except ConnectionResetError as e:
-            print(f"Error sending audio to client: {e}")
+            console.log(f"Error sending audio to client: {e}")
             if client_socket in self.read_list:
                 self.read_list.remove(client_socket)
 

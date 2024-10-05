@@ -26,9 +26,20 @@ def convert_and_normalize(audio_data_int16):
 def get_volume_norm(indata: np.ndarray):
     return np.sqrt(np.mean(np.square(indata))) * 20
 
+
 def print_sound(input_volume, output_volume, blocks=10):
     """"""
-    print("\rInput microphone:" + " " * blocks * 3 +
-          "\rInput microphone:" + "\u2588" * int(input_volume * blocks) + "\n" +
-          "\rOutput microphone:" + " " * blocks * 3 +
-          "\rOutput microphone:" + "\u2588" * int(output_volume * blocks) + "\033[A", end="", flush=True)
+    print(
+        "\rInput microphone:"
+        + " " * blocks * 3
+        + "\rInput microphone:"
+        + "\u2588" * int(input_volume * blocks)
+        + "\n"
+        + "\rOutput microphone:"
+        + " " * blocks * 3
+        + "\rOutput microphone:"
+        + "\u2588" * int(output_volume * blocks)
+        + "\033[A",
+        end="",
+        flush=True,
+    )

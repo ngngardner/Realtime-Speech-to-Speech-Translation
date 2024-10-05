@@ -9,8 +9,11 @@ from datetime import datetime, timezone
 import numpy as np
 import sounddevice as sd
 import speech_recognition as sr
+from rich.console import Console
 
 from client.utils.print_audio import convert_and_normalize, get_volume_norm, print_sound
+
+console = Console()
 
 
 class AudioSocketClient:
@@ -31,8 +34,8 @@ class AudioSocketClient:
     def __init__(self) -> None:
         # Prompt the user to select their devices
         self.input_device_index, self.output_device_index = sd.default.device
-        print(sd.query_devices())
-        print(
+        console.log(sd.query_devices())
+        console.log(
             f"Using input index of: {self.input_device_index}\noutput index of: {self.output_device_index}.",
         )
         if input(" Is this correct?\n y/[n]: ") != "y":
@@ -67,7 +70,7 @@ class AudioSocketClient:
 
     def __del__(self):
         # Destroy Audio resources
-        print("Shutting down")
+        console.log("Shutting down")
 
     def record_callback(self, _, audio: sr.AudioData):
         """Callback function for microphone input,
@@ -85,9 +88,9 @@ class AudioSocketClient:
     def start(self, ip, port):
         """Starts the client service"""
         # Connect to server
-        print(f"Attempting to connect to IP {ip}, port {port}")
+        console.log(f"Attempting to connect to IP {ip}, port {port}")
         self.socket.connect((ip, port))
-        print(f"Successfully connected to IP {ip}, port {port}")
+        console.log(f"Successfully connected to IP {ip}, port {port}")
         with self.source:
             self.recorder.adjust_for_ambient_noise(self.source)
         # Start microphone
@@ -97,7 +100,7 @@ class AudioSocketClient:
             phrase_time_limit=None,
         )
         ## Open audio as input from microphone
-        print("""Listening now...\nNote: The input microphone records
+        console.log("""Listening now...\nNote: The input microphone records
               in very large packets, so the volume meter won't move as much.""")
         self.volume_print_worker = threading.Thread(
             target=self.__volume_print_worker__,
@@ -127,9 +130,9 @@ class AudioSocketClient:
                         audio_output.write(audio_chunk)
                         self.volume_output = get_volume_norm(audio_chunk)
             except ConnectionResetError:
-                print("Server connection reset - shutting down client")
+                console.log("Server connection reset - shutting down client")
             except KeyboardInterrupt:
-                print("Received keyboard input - shutting down")
+                console.log("Received keyboard input - shutting down")
         # Close Socket Connection
         self.socket.shutdown(socket.SHUT_RDWR)
         self.socket.close()
@@ -156,7 +159,7 @@ class AudioSocketClient:
 
     def __debug_worker__(self):
         """Background worker to handle debug statements"""
-        print("Started background debug worker")
+        console.log("Started background debug worker")
         while True:
             if not self.time_last_sent:
                 # We can let the processor sleep more
@@ -179,12 +182,12 @@ def main():
     date_str = datetime.now(timezone.utc)
     logging.basicConfig(encoding="utf-8", level=logging.DEBUG)
     # Hide cursor in terminal:
-    print("\033[?25l", end="")
+    console.log("\033[?25l", end="")
     # Start server
     client = AudioSocketClient()
     client.start("localhost", 4444)
     # Show cursor again:
-    print("\033[?25h", end="")
+    console.log("\033[?25h", end="")
 
 
 if __name__ == "__main__":

@@ -10,6 +10,9 @@ import soundfile as sf
 import speech_recognition as sr
 import torch
 import whisper
+from rich.console import Console
+
+console = Console()
 
 
 class SpeechRecognitionModel:
@@ -49,11 +52,11 @@ class SpeechRecognitionModel:
         self.phrase_timeout = 1
 
         self.device = "cuda:0" if torch.cuda.is_available() else "cpu"
-        print(f"Loading model whisper-{model_name} on {self.device}")
+        console.log(f"Loading model whisper-{model_name} on {self.device}")
 
         self.audio_model = whisper.load_model(model_name, device=self.device)
         self.decoding_options: dict = {"task": "translate"}
-        print(f"Whisper DecodingOptions: {self.decoding_options}")
+        console.log(f"Whisper DecodingOptions: {self.decoding_options}")
         self.thread = None
         self._kill_thread = False
 
@@ -108,7 +111,7 @@ class SpeechRecognitionModel:
             seconds=self.phrase_timeout,
         ):
             if self.recent_transcription and self.current_client:
-                print(f"Flush {self.recent_transcription}")
+                console.log(f"Flush {self.recent_transcription}")
                 self.final_callback(self.recent_transcription, self.current_client)
                 self.recent_transcription = ""
 
@@ -119,7 +122,7 @@ class SpeechRecognitionModel:
         while not self.data_queue.empty():
             client, data = self.data_queue.get()
             if client != self.current_client:
-                print(f"Flush {self.recent_transcription}")
+                console.log(f"Flush {self.recent_transcription}")
                 self.final_callback(self.recent_transcription, self.current_client)
                 self.recent_transcription = ""
                 self.phrase_time = datetime.utcnow()
@@ -156,14 +159,14 @@ class SpeechRecognitionModel:
                         and self.recent_transcription
                         and self.current_client
                     ):
-                        print(f"Phrase complete: {self.recent_transcription}")
+                        console.log(f"Phrase complete: {self.recent_transcription}")
                         self.final_callback(
                             self.recent_transcription,
                             self.current_client,
                         )
                     self.recent_transcription = text
         except Exception as e:
-            print(f"Error during transcription: {e}")
+            console.log(f"Error during transcription: {e}")
 
     def __del__(self):
         self.stop()
