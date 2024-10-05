@@ -49,6 +49,10 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 uv handles installing dependenices and running the application.
 
 ```console
+# get the code
+git clone https://github.com/ngngardner/Realtime-Speech-to-Speech-Translation.git
+cd Realtime-Speech-to-Speech-Translation
+
 # run server
 uv run server
 
