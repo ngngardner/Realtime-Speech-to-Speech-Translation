@@ -24,7 +24,7 @@ Within the client, the user can pipe in the audio output to any virtual micropho
 
 Ensure your ports specified in server.py is open! The default port we chose was 4444.
 
-Install (FFmpeg)[https://www.ffmpeg.org/]:
+Install [FFmpeg](https://www.ffmpeg.org/):
 
 ```console
 # macOS and Linux
@@ -34,7 +34,7 @@ sudo apt install ffmpeg
 winget install --id=Gyan.FFmpeg  -e
 ```
 
-Install (uv)[https://docs.astral.sh/uv/]:
+Install [uv](https://docs.astral.sh/uv/):
 
 ```console
 # macOS and Linux
