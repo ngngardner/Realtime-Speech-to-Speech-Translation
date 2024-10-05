@@ -1,0 +1,32 @@
+[project]
+name = "realtime-speech-to-speech-translation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9,<3.10"
+dependencies = ["client", "server"]
+
+[tool.uv]
+dev-dependencies = ["ruff>=0.6.8"]
+
+[tool.uv.workspace]
+members = ["client", "server"]
+
+[tool.uv.sources]
+client = { workspace = true }
+server = { workspace = true }
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    # possible binding to all interfaces
+    "S104",
+    # dynamically typed expressions (typing.Any) are disallowed
+    "ANN401",
+]
+
+fixable = ["ALL"]
+unfixable = [
+    # imported but unused
+    "F401",
+]

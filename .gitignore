@@ -13,3 +13,4 @@ server/models/__pycache__/
 
 # Client Logs
 client/logs/*.log
+!embeddings.pt

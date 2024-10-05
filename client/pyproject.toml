@@ -1,0 +1,19 @@
+[project]
+name = "client"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.9,<3.10"
+dependencies = [
+    "pyaudio>=0.2.14",
+    "rich>=13.9.1",
+    "sounddevice>=0.5.0",
+    "speechrecognition>=3.10.4",
+]
+
+[project.scripts]
+client = "client.client:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
